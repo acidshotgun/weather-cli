@@ -1,12 +1,19 @@
 #! /usr/bin/env node
 
 import { getArgs } from "./helpers/args.js";
+import { getWeather } from "./services/api.service.js";
 import { printHelp, printSuccess, printError } from "./services/log.service.js";
-import { saveKeyValue } from "./services/storage.service.js";
+import { saveKeyValue, TOKEN_DICTIONARY } from "./services/storage.service.js";
 
 async function saveToken(token) {
+  // Если token(строка) указан - ок
+  // Если token == true - не ок (bool - не имеет длины)
+  if (!token.length) {
+    return printError("Не передан токен");
+  }
+
   try {
-    await saveKeyValue("token", token);
+    await saveKeyValue(TOKEN_DICTIONARY.token, token);
     printSuccess("Токен сохранен");
   } catch (error) {
     printError(error.message);
@@ -16,7 +23,7 @@ async function saveToken(token) {
 function initCLI() {
   const args = getArgs(process.argv);
 
-  console.log(process.argv); // просто видеть
+  // console.log(process.argv); // просто видеть
   console.log(args); // просто видеть
 
   if (args.h) {
@@ -30,6 +37,8 @@ function initCLI() {
   if (args.t) {
     return saveToken(args.t);
   }
+
+  getWeather("moscow");
 
   // Вывести погоду
 }
