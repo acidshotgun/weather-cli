@@ -7,7 +7,7 @@ import { saveKeyValue, TOKEN_DICTIONARY } from "./services/storage.service.js";
 
 async function saveToken(token) {
   // Если token(строка) указан - ок
-  // Если token == true - не ок (bool - не имеет длины)
+  // Если token != true - не ок (bool - не имеет длины)
   if (!token.length) {
     return printError("Не передан токен");
   }
@@ -17,6 +17,21 @@ async function saveToken(token) {
     printSuccess("Токен сохранен");
   } catch (error) {
     printError(error.message);
+  }
+}
+
+async function getForcast() {
+  try {
+    const weather = await getWeather("Нью-Йорк");
+    console.log(weather);
+  } catch (error) {
+    if (error?.response?.status == "404") {
+      printError("Неверно указан город");
+    } else if (error?.response?.status == "401") {
+      printError("Неверно указан токен");
+    } else {
+      console.log(error.message);
+    }
   }
 }
 
@@ -31,16 +46,14 @@ function initCLI() {
   }
 
   if (args.s) {
-    // Сохранить город
+    //return saveToken(args.s);
   }
 
   if (args.t) {
     return saveToken(args.t);
   }
 
-  getWeather("moscow");
-
-  // Вывести погоду
+  getForcast();
 }
 
 initCLI();
